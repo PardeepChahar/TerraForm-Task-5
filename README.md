@@ -18,6 +18,7 @@ Write terraform code to configure the following things on AWS -
 #### Code
 
 # create VPC
+```
 resource "aws_vpc" "main_vpc" {
   cidr_block       = "10.0.0.0/16"
 
@@ -25,9 +26,11 @@ resource "aws_vpc" "main_vpc" {
     Name = "main-vpc"
   }
 }
+```
+
 
 # create subnet in main_vpc
-resource "aws_subnet" "main_subnet" {
+```resource "aws_subnet" "main_subnet" {
   vpc_id     = aws_vpc.main_vpc.id
   cidr_block = "10.0.1.0/24"
   map_public_ip_on_launch = true
@@ -35,18 +38,18 @@ resource "aws_subnet" "main_subnet" {
   tags = {
     Name = "main-subnet"
   }
-}
+}```
 
 # create internet gateway
-resource "aws_internet_gateway" "igw" {
+```resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main_vpc.id
   tags = {
     Name = "main_igw"
   }
 }
-
+```
 # craete route table
-resource "aws_route_table" "main_rt" {
+```resource "aws_route_table" "main_rt" {
   vpc_id = aws_vpc.main_vpc.id
 
   route {
@@ -58,15 +61,15 @@ resource "aws_route_table" "main_rt" {
     Name = "main-rt"
   }
 }
-
+```
 # associate route table
-resource "aws_route_table_association" "a" {
+```resource "aws_route_table_association" "a" {
   subnet_id      = aws_subnet.main_subnet.id
   route_table_id = aws_route_table.main_rt.id
 }
-
+```
 #Create secrity group(ssh and http rule) in default vpc
-resource "aws_security_group" "allow_ssh" {
+```resource "aws_security_group" "allow_ssh" {
   name        = "allow_ssh"
   description = "Allow ssh inbound traffic"
   vpc_id      = aws_vpc.main_vpc.id
@@ -99,19 +102,18 @@ ingress {
     Name = "allow_ssh"
   }
 }
-
+```
 # create ec2 instance
-resource "aws_instance" "new-ec2" {
+```resource "aws_instance" "new-ec2" {
   ami           = "ami-0dc2d3e4c0f9ebd18"
   instance_type = "t2.micro"
   key_name = "pk_aws_key"
   subnet_id      = aws_subnet.main_subnet.id
   security_groups  = [aws_security_group.allow_ssh.id]
-
 }
-
+```
 # add null resource to connect and install & start server
-resource "null_resource" "nr1"{
+```resource "null_resource" "nr1"{
  connection {
     type     = "ssh"
     user     = "ec2-user"
@@ -128,4 +130,4 @@ resource "null_resource" "nr1"{
 		"sudo git clone https://github.com/vimallinuxworld13/gitphptest.git   /var/www/html"
     ]
   }
-}
+}```
